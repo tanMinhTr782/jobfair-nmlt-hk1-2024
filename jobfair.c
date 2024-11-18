@@ -494,7 +494,7 @@ void handleCommand(char *command, int map[MAX_ROW][MAX_COLUMN], Enterprise enter
 
 // Requirement 15: Optimize items collected using the knapsack algorithm
 int knapsack(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE],
-			  int maxWeight)
+			 int maxWeight, int numOfEnterprises, int index)
 {
 	//TODO: Return the maximum value collected
 }
