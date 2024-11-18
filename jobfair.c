@@ -348,23 +348,22 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 	}
 
 	if (strcmp(command,cmd2) == 0) { 
-		showIndexOfStatus(map, 0); 
+		showIndexOfStatus(map, Empty); 
 		return; 
 	}
 	if (strcmp(command,cmd3) == 0) { 
-		showIndexOfStatus(map, 1); 
+		showIndexOfStatus(map, Registered); 
 		return; 
 	}
 	if (strcmp(command,cmd4) == 0) { 
-		showTotalOfStatus(enterpriseArray, 0); 
+		showTotalOfStatus(enterpriseArray, Empty); 
 		return; 
 	}
 		if (strcmp(command,cmd5) == 0) { 
-		showTotalOfStatus(enterpriseArray, 1);
+		showTotalOfStatus(enterpriseArray, Registered);
 		return;  
 	}
 	// Handle showIndexBracket related command: Show [num] or show Show [from_index:to_index]
-	int size = strlen(command); 
 	int space_position = 0; 
 	int double_dot_position = 0; 
 
@@ -549,13 +548,13 @@ int main()
 	int totalEmpty = 0;
 
 	// Test Case 1: Register enterprises with automatic booth assignment
-	registerEnterprise(map, enterpriseArray, "Tech Co", -1, &booth, abbrev);
+	registerEnterprise(map, enterpriseArray, "Tech Co", -1, 10, 10, &booth, abbrev);
 	printf("Registered 'Tech Co' at booth %d with abbreviation %s\n", booth, abbrev);
 
-	registerEnterprise(map, enterpriseArray, "Innovative Solutions", 10, &booth, abbrev);
+	registerEnterprise(map, enterpriseArray, "Innovative Solutions", 10,10, 10,  &booth, abbrev);
 	printf("Registered 'Innovative Solutions' at booth %d with abbreviation %s\n", booth, abbrev);
 
-	registerEnterprise(map, enterpriseArray, "NextGen", -1, &booth, abbrev);
+	registerEnterprise(map, enterpriseArray, "NextGen", -1,10, 10, &booth, abbrev);
 	printf("Registered 'NextGen' at booth %d with abbreviation %s\n", booth, abbrev);
 
 	// Test Case 2: Show map to confirm booth registration
@@ -577,7 +576,7 @@ int main()
 	showTotalOfStatus(enterpriseArray, Registered);
 
 	// Test Case 5: Register an enterprise to an already occupied booth
-	registerEnterprise(map, enterpriseArray, "CompeteX", 10, &booth, abbrev);
+	registerEnterprise(map, enterpriseArray, "CompeteX", 10,10, 10, &booth, abbrev);
 	if (booth == -1)
 	{
 		printf("\nBooth 10 is already occupied. Registration failed for 'CompeteX'.\n");
@@ -601,7 +600,7 @@ int main()
 
 	// Test Case 7: Delete an enterprise and free up the booth
 	printf("\nDeleting 'Innovative Solutions' from booth 10:\n");
-	deleteEnterprise(enterpriseArray, "I", 10, &totalEmpty);
+	deleteEnterprise(map,enterpriseArray, "I", 10, &totalEmpty);
 	printf("Total empty booths after deletion: %d\n", totalEmpty);
 
 	// Show map to confirm deletion
