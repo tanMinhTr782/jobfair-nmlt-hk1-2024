@@ -53,7 +53,6 @@ void getAbbreviation(char *name, char *abbre)
             ++ptr;                     
         }
     }
-    printf("%s", abbre);
 }
 // Requirement 2: Determine the type of command
 CommandType getCommandType(char *command)
@@ -88,11 +87,11 @@ CommandType getCommandType(char *command)
 	}
 	//not exist space => first word = whole command. 
 	if (sizeOfFirstWordInInputCommand == 0) 
-		space_position = strlen(command); 
+		sizeOfFirstWordInInputCommand = strlen(command); 
 	
 
 	// Case 1: Not reach all cmd -> Fail
-	if (sizeOfInputCommand < sizeOfFirstWordInInputCommand) return INVALID; 
+	if (sizeOfFirstWordInInputCommand < sizeOfOriginalCommand ) return INVALID; 
 	
 	// Consider word of input cm have equal or more character than the Orignial Command. 
 	for (int i = 1; i < sizeOfFirstWordInInputCommand; ++i) { 
@@ -148,15 +147,6 @@ void createEnterprise(Enterprise *e, int booth_index, int itemValue, int itemWei
 		e->booth_index = booth_index; 
 		e->itemValue = itemValue; 
 		e->itemWeight = itemWeight; 
-
-		if (isNull == false) { 
-			free(e->name); 
-			free(e->abbre); 
-		}
-
-		e->name = (char*)malloc(sizeof(char*) * strlen(name)); 
-		e->abbre = (char*)malloc(sizeof(char*) * strlen(abbre)); 
-
 		strcpy(e->name , name);
 		strcpy(e->abbre , abbre);
 		return; 
@@ -172,60 +162,70 @@ void registerEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray
 	int boothToBePut = 0; 
 	int startRow = 0;
 	int startColumn = 0;  
-	bool isRegisterSuccessful= false; 
+	bool isRegisterSuccessful = false; 
 	// if booth's input is None
 	if (booth == -1)
 	{
 		boothToBePut = (strlen(abbre) * 30) % 26;
-		startRow = boothToBePut / MAX_COLUMN;
-		startColumn = boothToBePut - startRow * MAX_COLUMN;
 
-		for (int i = startRow; i < MAX_ROW; ++i)
+		for (int i = boothToBePut; i < MAX_ROW; ++i)
 		{
-			for (int j = startColumn; j < MAX_COLUMN; ++j)
-			{
-				if (map[i][j] == Empty)
-				{
-					isRegisterSuccessful = true;
-					break;
-				}
+			if (enterpriseArray[i].booth_index == -1) { 
+				isRegisterSuccessful = true; 
+				boothToBePut = i; 
+				break; 
 			}
 		}
 		if (isRegisterSuccessful == false)
 		{
-			for (int i = startRow; i < MAX_ROW; ++i)
+			for (int i = boothToBePut - 1; i >= 0; --i)
 			{
-				for (int j = 0; j < startColumn; ++j)
-				{
-					if (map[i][j] == Empty)
-					{
-						isRegisterSuccessful = true;
-						break;
-					}
+				if (enterpriseArray[i].booth_index == -1) { 
+					isRegisterSuccessful = true; 
+					boothToBePut = i; 
+					break; 
 				}
 			}
 		}
 		if (isRegisterSuccessful == false)
 		{
 			*out_booth = boothToBePut + 100;
-			out_abbre = abbre;
+			strcpy(out_abbre, abbre);
+			free(abbre); 
+			return; 
 		}
+		int rowM = boothToBePut / MAX_COLUMN;
+		int colM = boothToBePut - rowM * MAX_COLUMN;
+
+		map[rowM][colM] = Registered; 
+		
+		enterpriseArray[boothToBePut].booth_index = boothToBePut; 
+		enterpriseArray[boothToBePut].itemValue = itemValue; 
+		enterpriseArray[boothToBePut].itemWeight = itemWeight; 
+		strcpy(enterpriseArray[boothToBePut].name , name);
+		strcpy(enterpriseArray[boothToBePut].abbre , abbre);
+
+		*out_booth = boothToBePut + 200; 
+		strcpy(out_abbre, abbre);
+		free(abbre); 
+		return; 
 	}
-	else {
-		boothToBePut = booth; 
-		startRow = boothToBePut / MAX_COLUMN;
-		startColumn = boothToBePut - startRow * MAX_COLUMN;
-		if (map[startRow][startColumn] == Empty)
+	
+	if (enterpriseArray[booth].booth_index == -1)
 			isRegisterSuccessful = true;
 		else { 
 			*out_booth = boothToBePut + 100;
-			out_abbre = abbre;
+			strcpy(out_abbre, abbre);
+			free(abbre); 
+			return; 
 		}
-	}
 	enterpriseArray[boothToBePut].itemValue = itemValue; 
 	enterpriseArray[boothToBePut].itemWeight = itemWeight; 
 	strcpy(enterpriseArray[boothToBePut].name, name); 
 	strcpy(enterpriseArray[boothToBePut].abbre, abbre); 
+	*out_booth = boothToBePut + 100;
+	strcpy(out_abbre, abbre);
+	free(abbre); 
 	return; 
 }
 
@@ -233,32 +233,17 @@ void registerEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray
 void showMap(int map[MAX_ROW][MAX_COLUMN])
 {
 	// TODO: Implement this function
-	print("|"); 
-	for (int i = 0 ; i < MAX_COLUMN; ++i) { 
-		print("%d|", i); 
-	}
+	printf("|0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|\n"); 
 	printf("--\n"); 
-
-	print("|"); 
-	for (int i = 0 ; i < MAX_COLUMN; ++i) { 
-		print("%d|", map[0][i]); 
+	printf("|"); 
+	for (int i = 0; i < 14; ++i) { 
+		printf("%d|", map[0][i]); 
 	}
-	
-	print("--\n"); 
-
-
-	print("|"); 
-	for (int i = 0 ; i < MAX_COLUMN; ++i) { 
-		print("%d|", i + 15); 
+	printf("\n--\n"); 
+	printf("|"); 
+		for (int i = 0; i < 14; ++i) { 
+		printf("%d|", map[1][i]); 
 	}
-	
-	printf("--\n"); 
-	
-	print("|"); 
-	for (int i = 0 ; i < MAX_COLUMN; ++i) { 
-		print("%d|", map[1][i]); 
-	}
-	printf(""); 
 }
 
 // Requirement 8: Show booth indexes based on their status
@@ -266,7 +251,7 @@ void showIndexOfStatus(Enterprise enterpriseArray[MAX_ENTERPRISE], Status status
 {
 	// TODO: Implement this function
 
-	print("Index[");
+	printf("Index[");
 	bool first = true;
 	if (status == Empty)
 	{
@@ -276,10 +261,10 @@ void showIndexOfStatus(Enterprise enterpriseArray[MAX_ENTERPRISE], Status status
 			{
 				if (first == true)
 				{
-					print("%d", i);
+					printf("%d", i);
 					first = false;
 				}
-				print(",%d", i);
+				printf(",%d", i);
 			}
 		}
 	}
@@ -290,10 +275,10 @@ void showIndexOfStatus(Enterprise enterpriseArray[MAX_ENTERPRISE], Status status
 			{
 				if (first == true)
 				{
-					print("%d", i);
+					printf("%d", i);
 					first = false;
 				}
-				print(",%d", i);
+				printf(",%d", i);
 			}
 		}
 	}
@@ -304,7 +289,7 @@ void showIndexOfStatus(Enterprise enterpriseArray[MAX_ENTERPRISE], Status status
 void showTotalOfStatus(Enterprise enterpriseArray[MAX_ENTERPRISE], Status status)
 {
 	// TODO: Implement this function
-	print("Total: "); 
+	printf("Total: "); 
 	int count = 0; 
 		if (status == Empty){
 		for (int i = 0; i < MAX_ENTERPRISE; ++i){
@@ -328,13 +313,21 @@ void showIndexBracket(Enterprise enterpriseArray[MAX_ENTERPRISE], int start, int
 		printEnterpriseDetails(enterpriseArray[start]); 
 		return; 
 	}
+	bool last = false; 
 	for (int i = start; i <= end; ++i) { 
-		print("Index %d:", i); 
+		printf("Index %d:", i); 
 		if (enterpriseArray[i].booth_index == -1) { 
 			printf("NONE"); 
 			continue; 
 		}
+		printf("["); 
 		printEnterpriseDetails(enterpriseArray[i]); 
+		printf("]"); 
+		if (last == false) 
+			printf("\n");
+
+		if (i == end - 1)
+			last == true;
 	}
 	// TODO: Implement this function
 }
@@ -370,7 +363,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 		showTotalOfStatus(enterpriseArray, 1);
 		return;  
 	}
-	
+	// Handle showIndexBracket related command: Show [num] or show Show [from_index:to_index]
 	int size = strlen(command); 
 	int space_position = 0; 
 	int double_dot_position = 0; 
@@ -381,6 +374,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 		if (command[i] == ':')
 			double_dot_position = i; 
 	}
+	// If Show [num] is called. 
 	if (double_dot_position == 0) { 
 		char num[2]; 
 		strncpy(num, command+(space_position+1), size - (space_position+1)); 
@@ -388,7 +382,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 		showIndexBracket(enterpriseArray, index, -1); 
 		return; 
 	}
-	
+	// If Show [from_index:to_index] is called. 
 	char num1[2]; 
 	char num2[2]; 
 	strncpy(num1, command+(space_position+1), double_dot_position - (space_position)); 
@@ -403,9 +397,30 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 }
 
 // Requirement 12: Alter the booth assignment for a specified enterprise
-void emptyEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE],int registerBooth, int newBooth) 
+void moveEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE],int registerBooth, int newBooth) 
 { 
-	
+		enterpriseArray[newBooth].booth_index = newBooth;
+		strcpy(enterpriseArray[newBooth].name, enterpriseArray[registerBooth].name);
+		strcpy(enterpriseArray[newBooth].abbre, enterpriseArray[registerBooth].abbre);
+		enterpriseArray[newBooth].itemValue = enterpriseArray[registerBooth].itemValue;
+		enterpriseArray[newBooth].itemWeight = enterpriseArray[registerBooth].itemWeight;
+
+		enterpriseArray[registerBooth].booth_index = -1;
+		strcpy(enterpriseArray[registerBooth].name, "");
+		strcpy(enterpriseArray[registerBooth].abbre, "");
+		enterpriseArray[registerBooth].itemValue = 0;
+		enterpriseArray[registerBooth].itemWeight = 0;
+		// Empty the old location 
+		int rowM = registerBooth / MAX_COLUMN;
+		int colM = registerBooth - rowM * MAX_COLUMN;
+
+		map[rowM][colM] = Empty;
+
+		// Registered the new location. 
+		rowM = newBooth / MAX_COLUMN;
+		colM = newBooth - rowM * MAX_COLUMN;
+
+		map[rowM][colM] = Registered;
 }
 void alterEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char *abbre,
 					 int registerBooth, int newBooth, int *out_booth, char *out_abbre)
@@ -429,31 +444,43 @@ void alterEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MA
 		}
 		}
 
-		if (newPosition == -1) 
+		if (newPosition == -1) { 
+			*out_booth = newPosition + 100;
+			strcpy(out_abbre, abbre); 
 			return; 
+		}
+		*out_booth = newPosition + 200;
+		strcpy(out_abbre, abbre); 
 		moveEnterprise(map, enterpriseArray, registerBooth, newPosition); 
 		return; 
 	}
 
-	if (enterpriseArray[newBooth].booth_index != -1)
+	if (enterpriseArray[newBooth].booth_index != -1) { 
+		*out_booth = newBooth + 100;
+		strcpy(out_abbre, abbre); 			
 		return; 
+	}
+	*out_booth = newBooth + 200;
+	strcpy(out_abbre, abbre); 		
 	moveEnterprise(map, enterpriseArray, registerBooth,newBooth); 
 }
 
 // Requirement 13: Delete an enterprise from the system
 void deleteEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char *abbre, int booth, int *totalEmpty)
 {
-	// TODO: Implement this function
+	// Empty the enterprise information 
 		enterpriseArray[booth].booth_index = -1;
 		strcpy(enterpriseArray[booth].name, "");
 		strcpy(enterpriseArray[booth].abbre, "");
 		enterpriseArray[booth].itemValue = 0;
 		enterpriseArray[booth].itemWeight = 0;
 
+	// Unregister them in the map. 
 		int rowIndex = booth / MAX_COLUMN; 
 		int colIndex = booth - rowIndex * MAX_COLUMN; 
 
 		map[rowIndex][colIndex] = Empty; 
+
 		*totalEmpty = *totalEmpty - 1; 
 		return; 
 }
