@@ -383,7 +383,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 		char num[2]; 
 		strncpy(num, command+(space_position+1), size - (space_position+1)); 
 		int index = atoi(num); 
-        printf ("Show%d", index);
+		showIndexBracket(enterpriseArray, index, -1);
 		return; 
 	}
 	// If Show [from_index:to_index] is called. 
@@ -393,7 +393,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 	strncpy(num2, command+(double_dot_position + 1), second_bracket_position - double_dot_position - 1); 
 	int start = atoi(num1); 
 	int end = atoi(num2); 
-    printf ("start %d end %d", start, end);
+	showIndexBracket(enterpriseArray, start, -1);
 	return; 
 }
 
