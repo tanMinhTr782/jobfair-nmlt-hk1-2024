@@ -351,9 +351,9 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
         if (size <= space_position + 2)
 			return;
         if (command[space_position + 2] == '0')
-            showIndexOfStatus(map, Empty); 
+            showIndexOfStatus(enterpriseArray, Empty); 
         if (command[space_position + 2] == '1')
-        	showIndexOfStatus(map, Registered); 
+        	showIndexOfStatus(enterpriseArray, Registered); 
         return;
     }
 
@@ -363,7 +363,7 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
         if (command[space_position + 2] == '0')
             showTotalOfStatus(enterpriseArray, Empty); 
         if (command[space_position + 2] == '1')
-            showIndexOfStatus(map, Registered); 
+            showIndexOfStatus(enterpriseArray, Registered); 
         return;
     }
 	// Handle showIndexBracket related command: Show [num] or show Show [from_index:to_index]
@@ -380,8 +380,9 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 	}
 	// If Show [num] is called. 
 	if (double_dot_position == 0) { 
-		char num[2]; 
+		char num[3]; 
 		strncpy(num, command+(space_position+1), size - (space_position+1)); 
+		num[size - (space_position+1)] = '\0';
 		int index = atoi(num); 
 		showIndexBracket(enterpriseArray, index, -1);
 		return; 
@@ -391,6 +392,8 @@ void handleShowCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[
 	char num2[3]; 
 	strncpy(num1, command+(first_bracket_position + 1), double_dot_position - (first_bracket_position+1)); 
 	strncpy(num2, command+(double_dot_position + 1), second_bracket_position - double_dot_position - 1); 
+	num1[double_dot_position - (first_bracket_position+1)] = '\0';
+	num2[second_bracket_position - double_dot_position - 1] = '\0';
 	int start = atoi(num1); 
 	int end = atoi(num2); 
 	showIndexBracket(enterpriseArray, start, -1);
@@ -470,6 +473,8 @@ void alterEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MA
 void deleteEnterprise(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char *abbre, int booth, int *totalEmpty)
 {
 	// Empty the enterprise information 
+		strcpy(abbre, enterpriseArray[booth].abbre);
+
 		enterpriseArray[booth].booth_index = -1;
 		strcpy(enterpriseArray[booth].name, "");
 		strcpy(enterpriseArray[booth].abbre, "");
@@ -511,9 +516,96 @@ void handleCommand(char *command, int map[MAX_ROW][MAX_COLUMN], Enterprise enter
 	}
 
 }
+
 void handleRegisterCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
 {
 	//  Register [VNG] [1] [2] [2]
+	int size = strlen(command);
+	
+	int first_space = 0; 
+	for (int i = 0 ; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			first_space = i; 
+			break; 
+		}
+	}
+
+	int second_space = 0;
+	for (int i = first_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			second_space = i; 
+			break;
+		}
+	}
+
+	int third_space = 0;
+	for (int i = second_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			third_space = i; 
+			break;
+		}
+	}
+
+	int last_space = 0;
+	for (int i = third_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			last_space = i; 
+			break;
+		}
+	}
+	char name[100];
+	char booth_index[3];
+	char item_value[10];
+	char item_weight[10];
+
+
+	strncpy(name, command + first_space + 2, second_space - first_space - 3);
+	strncpy(booth_index, command + second_space + 2, third_space - second_space - 3);
+	strncpy(item_value, command + third_space + 2, last_space - third_space - 3);
+	strncpy(item_weight, command + last_space + 2, size - last_space - 3);
+    
+    name[second_space - first_space - 3] = '\0';
+    booth_index[third_space - second_space - 3] = '\0';
+    item_value[last_space - third_space - 3] = '\0';
+    item_weight[size - last_space - 3] = '\0';
+
+	int boothIndex = atoi(booth_index);
+	int itemValue = atoi(item_value);
+	int itemWeight = atoi(item_weight); 
+
+	int booth = 0;
+	char abbrev[10];
+	int totalEmpty = 0;
+	registerEnterprise(map,enterpriseArray,name,boothIndex,itemValue,itemWeight,booth,abbrev);
+	return;
+}
+void handleAlterCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
+{
+	//   Alter [<abbre>] [reigster_booth] [new_booth]
+	int first_space = 0; 
+	int size = strlen(command);
+	for (int i = 0 ; i < size; ++i) { 
+		
+	}
+}
+void handleDeleteCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
+{
+	//   Delete [<abbre>] [reigsterBooth]
+
+	int first_space = 0; 
+	int size = strlen(command);
+	for (int i = 0 ; i < size; ++i) { 
+		
+	}
+}
+void handleQuitCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
+{
+	//  Register [VNG] [1] [2] [2]
+	int first_space = 0; 
+	int size = strlen(command);
+	for (int i = 0 ; i < size; ++i) { 
+		
+	}
 }
 // Requirement 15: Optimize items collected using the knapsack algorithm
 int knapsack(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE],
