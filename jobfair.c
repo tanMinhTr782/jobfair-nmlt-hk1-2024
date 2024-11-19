@@ -576,36 +576,100 @@ void handleRegisterCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseAr
 	int booth = 0;
 	char abbrev[10];
 	int totalEmpty = 0;
-	registerEnterprise(map,enterpriseArray,name,boothIndex,itemValue,itemWeight,booth,abbrev);
+	registerEnterprise(map,enterpriseArray,name,boothIndex,itemValue,itemWeight,&booth,&abbrev);
 	return;
 }
 void handleAlterCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
 {
 	//   Alter [<abbre>] [reigster_booth] [new_booth]
-	int first_space = 0; 
 	int size = strlen(command);
+	
+	int first_space = 0; 
 	for (int i = 0 ; i < size; ++i) { 
-		
+		if (command[i] == ' ') { 
+			first_space = i; 
+			break; 
+		}
 	}
+
+	int second_space = 0;
+	for (int i = first_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			second_space = i; 
+			break;
+		}
+	}
+
+	int third_space = 0;
+	for (int i = second_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			third_space = i; 
+			break;
+		}
+	}
+	char abbre[10];
+	char register_booth[3];
+	char new_booth[3];
+
+	strncpy(abbre, command + first_space + 2, second_space - first_space - 3);
+	strncpy(register_booth, command + second_space + 2, third_space - second_space - 3);
+	strncpy(new_booth, command + third_space + 2, size - third_space - 3);
+    
+    abbre[second_space - first_space - 3] = '\0';
+    register_booth[third_space - second_space - 3] = '\0';
+    new_booth[size - third_space - 3] = '\0';
+
+	int registerBooth = atoi(register_booth);
+	int newBooth = atoi(new_booth);
+
+	int booth = 0;
+	char abbrev[10];
+	int totalEmpty = 0;
+	alterEnterprise(map,enterpriseArray,abbrev,registerBooth,newBooth, &booth, &abbrev);
+	return;
 }
 void handleDeleteCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
 {
 	//   Delete [<abbre>] [reigsterBooth]
-
-	int first_space = 0; 
 	int size = strlen(command);
+	
+	int first_space = 0; 
 	for (int i = 0 ; i < size; ++i) { 
-		
+		if (command[i] == ' ') { 
+			first_space = i; 
+			break; 
+		}
 	}
+
+	int second_space = 0;
+	for (int i = first_space + 1; i < size; ++i) { 
+		if (command[i] == ' ') { 
+			second_space = i; 
+			break;
+		}
+	}
+	char abbre[10];
+	char register_booth[3];
+]
+	strncpy(abbre, command + first_space + 2, second_space - first_space - 3);
+	strncpy(register_booth, command + second_space + 2, size - second_space - 3);
+    
+    abbre[second_space - first_space - 3] = '\0';
+    register_booth[size - second_space - 3] = '\0';
+
+	int registerBooth = atoi(register_booth);
+	int newBooth = atoi(new_booth);
+
+	int booth = 0;
+	char abbrev[10];
+	int totalEmpty = 0;
+	deleteEnterprise(map,enterpriseArray,abbrev,registerBooth, &totalEmpty);
+	return;
 }
 void handleQuitCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE], char* command)
 {
-	//  Register [VNG] [1] [2] [2]
-	int first_space = 0; 
-	int size = strlen(command);
-	for (int i = 0 ; i < size; ++i) { 
-		
-	}
+	//  Check if command is vaild 
+	return; 
 }
 // Requirement 15: Optimize items collected using the knapsack algorithm
 int knapsack(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArray[MAX_ENTERPRISE],
