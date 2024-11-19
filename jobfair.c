@@ -650,7 +650,6 @@ void handleDeleteCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArra
 	}
 	char abbre[10];
 	char register_booth[3];
-]
 	strncpy(abbre, command + first_space + 2, second_space - first_space - 3);
 	strncpy(register_booth, command + second_space + 2, size - second_space - 3);
     
@@ -658,7 +657,6 @@ void handleDeleteCommand(int map[MAX_ROW][MAX_COLUMN], Enterprise enterpriseArra
     register_booth[size - second_space - 3] = '\0';
 
 	int registerBooth = atoi(register_booth);
-	int newBooth = atoi(new_booth);
 
 	int booth = 0;
 	char abbrev[10];
@@ -723,7 +721,7 @@ int main()
 	initMap(map);
 	initEnterpriseArray(enterpriseArray);
 
-	int booth;
+	int booth = 0;
 	char abbrev[10];
 	int totalEmpty = 0;
 
