@@ -53,7 +53,7 @@ void getAbbreviation(char *name, char *abbre)
 CommandType getCommandType(char *command)
 {
 	// TODO: Implement this function
-	char cmdList[6][8] = {
+	char cmdList[6][9] = {
 			"Register", 
 			"Alter", 
 			"Show", 
@@ -65,9 +65,10 @@ CommandType getCommandType(char *command)
 	int position = 5; 	
 	if (command[0] == 'R') position = 0; 
 	if (command[0] == 'A') position = 1; 
-	if (command[0] == 'D') position = 2; 
-	if (command[0] == 'Q') position = 3; 
-	if (command[0] == 'I') position = 4; 
+	if (command[0] == 'S') position = 2; 
+	if (command[0] == 'D') position = 3; 
+	if (command[0] == 'Q') position = 4; 
+	if (command[0] == 'I') position = 5; 
 	
 	if (position == 5) return INVALID; 
 
@@ -84,10 +85,8 @@ CommandType getCommandType(char *command)
 	if (sizeOfFirstWordInInputCommand == 0) 
 		sizeOfFirstWordInInputCommand = strlen(command); 
 	
-
 	// Case 1: Not reach all cmd -> Fail
 	if (sizeOfFirstWordInInputCommand < sizeOfOriginalCommand ) return INVALID; 
-	
 	// Consider word of input cm have equal or more character than the Orignial Command. 
 	for (int i = 1; i < sizeOfFirstWordInInputCommand; ++i) { 
 		if (command[i] != cmdList[position][i])
@@ -715,83 +714,104 @@ void initEnterpriseArray(Enterprise enterpriseArray[MAX_ENTERPRISE])
 
 int main()
 {
-	// Initialize the map and enterprise array
-	int map[MAX_ROW][MAX_COLUMN];
-	Enterprise enterpriseArray[MAX_ENTERPRISE];
-	initMap(map);
-	initEnterpriseArray(enterpriseArray);
+		
+int map[MAX_ROW][MAX_COLUMN];
+    Enterprise enterpriseArray[MAX_ENTERPRISE];
+    initMap(map);
+    char* command_name[] = {"REGISTER", "ALTER", "SHOW", "DELETE", "QUIT", "INVALID"};
+    initEnterpriseArray(enterpriseArray);
+    printf("----- Sample testcase 01 -----\n");
+    printf("Test getCommandType:\n");
+    // char command[] = "Show map";
+	// char command[] = "Show [:10]";
+		// char command[] = "Quit";
+		// char command[] = "Showall";
 
-	int booth = 0;
-	char abbrev[10];
-	int totalEmpty = 0;
+		// char command[] = "Register [VNG] [1] [2] [2]";
+		// char command[] = "Show [from_index:to_index]";
+		// char command[] = "Alter [VNG] [11] [12]";
+		char command[] = "Delete [VNG] [11]";
 
-	// Test Case 1: Register enterprises with automatic booth assignment
-	registerEnterprise(map, enterpriseArray, "Tech Co", -1, 10, 10, &booth, abbrev);
-	printf("Registered 'Tech Co' at booth %d with abbreviation %s\n", booth, abbrev);
+    CommandType cmd_type = getCommandType(command);
+    printf("Command     : %s\n", command);
+    printf("Command type: %s\n", command_name[cmd_type]);
+	// // Initialize the map and enterprise array
+	// int map[MAX_ROW][MAX_COLUMN];
+	// Enterprise enterpriseArray[MAX_ENTERPRISE];
+	// initMap(map);
+	// initEnterpriseArray(enterpriseArray);
 
-	registerEnterprise(map, enterpriseArray, "Innovative Solutions", 10,10, 10,  &booth, abbrev);
-	printf("Registered 'Innovative Solutions' at booth %d with abbreviation %s\n", booth, abbrev);
+	// int booth = 0;
+	// char abbrev[10];
+	// int totalEmpty = 0;
 
-	registerEnterprise(map, enterpriseArray, "NextGen", -1,10, 10, &booth, abbrev);
-	printf("Registered 'NextGen' at booth %d with abbreviation %s\n", booth, abbrev);
+	// // Test Case 1: Register enterprises with automatic booth assignment
+	// registerEnterprise(map, enterpriseArray, "Tech Co", -1, 10, 10, &booth, abbrev);
+	// printf("Registered 'Tech Co' at booth %d with abbreviation %s\n", booth, abbrev);
 
-	// Test Case 2: Show map to confirm booth registration
-	printf("\nMap Status after Registrations:\n");
-	showMap(map);
+	// registerEnterprise(map, enterpriseArray, "Innovative Solutions", 10,10, 10,  &booth, abbrev);
+	// printf("Registered 'Innovative Solutions' at booth %d with abbreviation %s\n", booth, abbrev);
 
-	// Test Case 3: Show indexes based on their status
-	printf("\nEmpty Booths:\n");
-	showIndexOfStatus(enterpriseArray, Empty);
+	// registerEnterprise(map, enterpriseArray, "NextGen", -1,10, 10, &booth, abbrev);
+	// printf("Registered 'NextGen' at booth %d with abbreviation %s\n", booth, abbrev);
 
-	printf("\nRegistered Booths:\n");
-	showIndexOfStatus(enterpriseArray, Registered);
+	// // Test Case 2: Show map to confirm booth registration
+	// printf("\nMap Status after Registrations:\n");
+	// showMap(map);
 
-	// Test Case 4: Show total count of booths with specific status
-	printf("\nTotal Empty Booths:\n");
-	showTotalOfStatus(enterpriseArray, Empty);
+	// // Test Case 3: Show indexes based on their status
+	// printf("\nEmpty Booths:\n");
+	// showIndexOfStatus(enterpriseArray, Empty);
 
-	printf("Total Registered Booths:\n");
-	showTotalOfStatus(enterpriseArray, Registered);
+	// printf("\nRegistered Booths:\n");
+	// showIndexOfStatus(enterpriseArray, Registered);
 
-	// Test Case 5: Register an enterprise to an already occupied booth
-	registerEnterprise(map, enterpriseArray, "CompeteX", 10,10, 10, &booth, abbrev);
-	if (booth == -1)
-	{
-		printf("\nBooth 10 is already occupied. Registration failed for 'CompeteX'.\n");
-	}
+	// // Test Case 4: Show total count of booths with specific status
+	// printf("\nTotal Empty Booths:\n");
+	// showTotalOfStatus(enterpriseArray, Empty);
 
-	// Test Case 6: Alter the booth assignment for an enterprise
-	printf("\nAltering 'NextGen' from current booth to booth 12:\n");
-	alterEnterprise(map, enterpriseArray, "N", booth, 12, &booth, abbrev);
-	if (booth != -1)
-	{
-		printf("Booth assignment altered successfully for 'NextGen' to booth %d.\n", booth);
-	}
-	else
-	{
-		printf("Failed to alter booth assignment for 'NextGen'.\n");
-	}
+	// printf("Total Registered Booths:\n");
+	// showTotalOfStatus(enterpriseArray, Registered);
 
-	// Show map to confirm the booth alteration
-	printf("\nMap Status after Alteration:\n");
-	showMap(map);
+	// // Test Case 5: Register an enterprise to an already occupied booth
+	// registerEnterprise(map, enterpriseArray, "CompeteX", 10,10, 10, &booth, abbrev);
+	// if (booth == -1)
+	// {
+	// 	printf("\nBooth 10 is already occupied. Registration failed for 'CompeteX'.\n");
+	// }
 
-	// Test Case 7: Delete an enterprise and free up the booth
-	printf("\nDeleting 'Innovative Solutions' from booth 10:\n");
-	deleteEnterprise(map,enterpriseArray, "I", 10, &totalEmpty);
-	printf("Total empty booths after deletion: %d\n", totalEmpty);
+	// // Test Case 6: Alter the booth assignment for an enterprise
+	// printf("\nAltering 'NextGen' from current booth to booth 12:\n");
+	// alterEnterprise(map, enterpriseArray, "N", booth, 12, &booth, abbrev);
+	// if (booth != -1)
+	// {
+	// 	printf("Booth assignment altered successfully for 'NextGen' to booth %d.\n", booth);
+	// }
+	// else
+	// {
+	// 	printf("Failed to alter booth assignment for 'NextGen'.\n");
+	// }
 
-	// Show map to confirm deletion
-	printf("\nMap Status after Deletion:\n");
-	showMap(map);
+	// // Show map to confirm the booth alteration
+	// printf("\nMap Status after Alteration:\n");
+	// showMap(map);
 
-	// Test Case 8: Knapsack optimization test with sample data
-	int maxWeight = 10;
-	int maxValue, usedWeight;
-	knapsack(map, enterpriseArray, maxWeight, &maxValue, &usedWeight);
-	printf("\nKnapsack Optimization:\n");
-	printf("Max Value Collected: %d with Weight Used: %d\n", maxValue, usedWeight);
+	// // Test Case 7: Delete an enterprise and free up the booth
+	// printf("\nDeleting 'Innovative Solutions' from booth 10:\n");
+	// deleteEnterprise(map,enterpriseArray, "I", 10, &totalEmpty);
+	// printf("Total empty booths after deletion: %d\n", totalEmpty);
 
-	return 0;
+	// // Show map to confirm deletion
+	// printf("\nMap Status after Deletion:\n");
+	// showMap(map);
+
+	// // Test Case 8: Knapsack optimization test with sample data
+	// int maxWeight = 10;
+	// int maxValue, usedWeight;
+	// knapsack(map, enterpriseArray, maxWeight, &maxValue, &usedWeight);
+	// printf("\nKnapsack Optimization:\n");
+	// printf("Max Value Collected: %d with Weight Used: %d\n", maxValue, usedWeight);
+
+	// return 0;
 }
 
